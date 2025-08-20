@@ -1,75 +1,136 @@
-README.md
-# Local RAG with PDF
+# RAG Tutor - AI-Powered Document Q&A System
 
-A Retrieval-Augmented Generation (RAG) system that works entirely locally using Chroma vector database and Ollama.
+A comprehensive Retrieval-Augmented Generation (RAG) system with FastAPI backend, Gradio UI, and full observability via Prometheus and Grafana.
+
+## Features
+
+- **FastAPI Backend**: RESTful API with automatic retry logic and comprehensive error handling
+- **Gradio UI**: User-friendly web interface for document Q&A
+- **Full Observability**: Prometheus metrics and Grafana dashboards
+- **Docker Support**: Complete containerization with docker-compose
+- **Production Ready**: Proper logging, monitoring, and error handling
+- **Local LLM Support**: Works with Ollama and other OpenAI-compatible endpoints
 
 ## Quick Start
 
-### Option 1: Using Make (recommended)
+### Option 1: Docker Compose (Recommended)
 ```bash
-# First time setup
-make setup
+# Navigate to the ragtutor directory
+cd ragtutor
 
-# Ingest your PDF
-make ingest
+# Build and run all services
+docker compose up --build
+```
 
-# Test a query
-make query Q="How do I set goals with a client?"
+Access the services:
+- **API Documentation**: http://localhost:8000/docs
+- **Gradio UI**: http://localhost:7860
+- **Prometheus**: http://localhost:9090
+- **Grafana**: http://localhost:3000 (admin/admin)
 
-# Launch UI
-make serve
-Option 2: Using setup script
-# Make script executable (first time only)
-chmod +x setup.sh
-
-# First time setup
-./setup.sh setup
-
-# Ingest your PDF
-./setup.sh ingest
-
-# Test a query
-./setup.sh query "How do I set goals with a client?"
-
-# Launch UI
-./setup.sh serve
-Option 3: Manual setup
-# Create and activate virtual environment
-python3 -m venv .venv
-source .venv/bin/activate
+### Option 2: Local Development
+```bash
+# Create virtual environment
+python -m venv .venv
+source .venv/bin/activate  # On Windows: .venv\Scripts\activate
 
 # Install dependencies
 pip install -r requirements.txt
+pip install -e .
 
-# Follow the original workflow...
-Project Structure
-.
-├── rag_local_pdf.py      # Main application
-├── requirements.txt      # Python dependencies
-├── Makefile             # Automation commands
-├── setup.sh             # Alternative setup script
-├── data/                # Your PDF files
-│   └── coaching.pdf
-├── storage/             # Vector database (auto-created)
-├── .venv/               # Virtual environment
-└── README.md
-Commands Reference
-* make help - Show all available commands
-* make setup - One-time project setup
-* make ingest - Process PDF into vector database
-* make serve - Launch web interface
-* make clean - Reset entire project
-	•	make reset-db - Clear database only
-## 5. .gitignore
-Virtual environment
-.venv/ venv/
-Vector database storage
-storage/
-Python cache
-pycache/ *.pyc *.pyo
-Environment variables
-.env
-OS files
-.DS_Store Thumbs.db
-IDE files
-.vscode/ .idea/ *.swp *.swo
+# Start API server
+uvicorn ragtutor.api.main:app --host 0.0.0.0 --port 8000
+
+# In another terminal, start Gradio UI
+python -m ragtutor.ui.gradio_app
+```
+
+## API Usage
+
+### Query Documents
+```bash
+curl -X POST "http://localhost:8000/query" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "query": "What are the key coaching principles?",
+    "top_k": 5,
+    "collection_name": "documents"
+  }'
+```
+
+### Upload Document
+```bash
+curl -X POST "http://localhost:8000/upload" \
+  -H "Content-Type: application/json" \
+  -d '{
+    "filename": "coaching.pdf",
+    "content": "<base64-encoded-pdf>",
+    "collection_name": "documents"
+  }'
+```
+
+## Configuration
+
+Copy `.env.example` to `.env` and adjust settings:
+
+```bash
+# API Configuration
+LOG_LEVEL=INFO
+API_PORT=8000
+
+# RAG Configuration
+MODEL_NAME=llama3.2
+LLM_BASE_URL=http://localhost:11434/v1
+LLM_API_KEY=ollama
+
+# Monitoring
+PROMETHEUS_SCRAPE_INTERVAL=5s
+GRAFANA_HOST_PORT=3000
+PROMETHEUS_HOST_PORT=9090
+```
+
+## Testing
+
+```bash
+# Run all tests
+pytest
+
+# Run with coverage
+pytest --cov=ragtutor
+
+# Run specific test file
+pytest ragtutor/tests/test_api.py
+```
+
+## Development
+
+### Adding New Features
+1. Add business logic in `ragtutor/core/`
+2. Add API endpoints in `ragtutor/api/routes.py`
+3. Add UI components in `ragtutor/ui/`
+4. Add tests in `ragtutor/tests/`
+
+### Monitoring
+- **Prometheus**: Collects metrics from the FastAPI app
+- **Grafana**: Visualizes RAG usage, query performance, and error rates
+- **Custom Metrics**: Track query duration, error types, and vector operations
+
+## Troubleshooting
+
+### Common Issues
+1. **LLM Connection**: Ensure Ollama is running at `LLM_BASE_URL`
+2. **Port Conflicts**: Check if ports 8000, 7860, 9090, 3000 are available
+3. **Memory Issues**: Reduce `chunk_size` in settings for large documents
+
+### Logs
+```bash
+# View API logs
+docker compose logs rag-api
+
+# View UI logs  
+docker compose logs rag-ui
+```
+
+## License
+
+This project is open source and available under the MIT License.

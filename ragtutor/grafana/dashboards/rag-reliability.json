@@ -1,0 +1,20 @@
+{
+  "title": "RAG Reliability",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "Errors by Type",
+      "targets": [
+        { "expr": "sum by (error_type) (increase(rag_errors_total[5m]))" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Vector Ops",
+      "targets": [
+        { "expr": "sum by (operation, status) (increase(vector_operations_total[5m]))" }
+      ]
+    }
+  ]
+}
+

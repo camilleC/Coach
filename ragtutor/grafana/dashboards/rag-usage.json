@@ -1,0 +1,20 @@
+{
+  "title": "RAG Usage",
+  "panels": [
+    {
+      "type": "graph",
+      "title": "RAG Queries",
+      "targets": [
+        { "expr": "sum by (collection, status) (rag_queries_total)" }
+      ]
+    },
+    {
+      "type": "graph",
+      "title": "Query Duration",
+      "targets": [
+        { "expr": "histogram_quantile(0.95, sum(rate(rag_query_duration_seconds_bucket[5m])) by (le))" }
+      ]
+    }
+  ]
+}
+
