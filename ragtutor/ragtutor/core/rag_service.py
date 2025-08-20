@@ -1,5 +1,6 @@
 from __future__ import annotations
 
+import os
 from dataclasses import dataclass
 from typing import Dict, List, Optional
 
@@ -28,6 +29,24 @@ class RAGService:
         self.embedder = EmbeddingClient()
         self.vstore = VectorStore()
         self.llm = LLMClient()
+        
+        # Auto-load default document if it exists
+        await self._load_default_document()
+
+    async def _load_default_document(self) -> None:
+        """Load the default document if it exists"""
+        pdf_path = settings.pdf_path
+        if os.path.exists(pdf_path):
+            try:
+                with open(pdf_path, 'rb') as f:
+                    content = f.read()
+                filename = os.path.basename(pdf_path)
+                result = await self.ingest_document(filename, content, None)
+                print(f"✅ Loaded PDF document: {filename} ({result['chunks_created']} chunks)")
+            except Exception as e:
+                print(f"⚠️ Failed to load PDF document: {e}")
+        else:
+            print(f"ℹ️ No PDF document found at {pdf_path}")
 
     async def cleanup(self) -> None:
         # Chroma client does not require explicit close; leave hook for future resources
@@ -67,7 +86,7 @@ class RAGService:
         context = "\n\n".join(context_parts)
 
         prompt = (
-            "You are an expert assistant that answers based only on the context.\n"
+            "You are an expert coach. Answer based only on the context.\n"
             "If the answer cannot be found in the context, say you don't know.\n\n"
             f"Context:\n{context}\n\nQuestion: {query}\nAnswer:"
         )

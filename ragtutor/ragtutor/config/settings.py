@@ -1,6 +1,7 @@
 from pydantic_settings import BaseSettings
 from pydantic import field_validator, model_validator
 
+
 class Settings(BaseSettings):
     # API Configuration
     api_host: str = "0.0.0.0"
@@ -8,12 +9,14 @@ class Settings(BaseSettings):
     log_level: str = "INFO"
 
     # RAG Configuration
-    vector_db_persist_dir: str = "./storage/chroma"
+    vector_db_persist_dir: str = "/tmp/memory"  # Temporary storage (cleared on restart)
     collection_name: str = "documents"
     embedding_model: str = "sentence-transformers/all-MiniLM-L6-v2"
     chunk_size: int = 1000
     chunk_overlap: int = 150
     top_k: int = 5
+    default_document_path: str = "./data/coaching.pdf"  # Default fallback
+    pdf_path: str = "./data/coaching.pdf"  # Will be overridden by PDF env var
 
     # LLM Configuration
     llm_model: str = "llama3.2"

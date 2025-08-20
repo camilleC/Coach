@@ -26,8 +26,7 @@ class RAGGradioInterface:
             if not self.rag_service:
                 return "❌ RAG service not initialized", ""
 
-            loop = asyncio.get_event_loop()
-            result = loop.run_until_complete(
+            result = asyncio.run(
                 self.rag_service.query(
                     query=query,
                     top_k=top_k,
@@ -49,15 +48,15 @@ class RAGGradioInterface:
 
     def create_interface(self):
         """Create Gradio interface"""
-        with gr.Blocks(title="RAG Tutor - Document Q&A", theme=gr.themes.Soft()) as demo:
-            gr.Markdown("# 📚 RAG Tutor - Document Q&A System")
+        with gr.Blocks(title="Personal Coach", theme=gr.themes.Soft()) as demo:
+            gr.Markdown("# 📚 Personal Coach")
             gr.Markdown("Ask questions about your uploaded documents and get AI-powered answers with source citations.")
 
             with gr.Row():
                 with gr.Column(scale=2):
                     query_input = gr.Textbox(
-                        label="Your Question",
-                        placeholder="e.g., What are the key principles of effective coaching?",
+                        label="I need help deciding if I should go on vacation.",
+                        placeholder="e.g., When you think about going on vacation how do you feel?",
                         lines=3,
                     )
 
@@ -94,9 +93,9 @@ class RAGGradioInterface:
             gr.Markdown(
                 """
             ### Example Questions:
-            - "What are the main coaching techniques mentioned in the document?"
-            - "How should I prepare for a coaching session?"
-            - "What are the ethical guidelines for coaches?"
+            - "I need help deciding if I should change careers?"
+            - "I'm not sure how to start my next project?"
+            - "should I bring a new business partner onto the project?"
             """
             )
 

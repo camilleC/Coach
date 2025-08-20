@@ -1,4 +1,3 @@
-
 services:
   rag-api:
     build: .
@@ -6,11 +5,15 @@ services:
       - "${API_PORT:-8000}:8000"
     environment:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
-      - LLM_BASE_URL=http://host.docker.internal:11434/v1
-      - VECTOR_DB_PERSIST_DIR=/app/data
-    volumes:
-      - ./data:/app/data
-      - ./uploads:/app/uploads
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+      - VECTOR_DB_PERSIST_DIR=${VECTOR_DB_PERSIST_DIR:-/tmp/memory}
+      - MODEL_NAME=${MODEL_NAME:-llama3.2}
+      - LLM_API_KEY=${LLM_API_KEY:-ollama}
+      - PDF=${PDF:-./data/coaching.pdf}
+      - HF_HUB_DISABLE_TELEMETRY=1
+      - DISABLE_TELEMETRY=1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
     depends_on:
       - prometheus
     networks:
@@ -25,6 +28,17 @@ services:
       - LOG_LEVEL=${LOG_LEVEL:-INFO}
       - API_HOST=rag-api
       - API_PORT=8000
+      - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
+      - LLM_API_KEY=${LLM_API_KEY:-ollama}
+      - MODEL_NAME=${MODEL_NAME:-llama3.2}
+      - PDF=${PDF:-./data/coaching.pdf}
+      - GRADIO_ANALYTICS_DISABLED=true
+      - HF_HUB_DISABLE_TELEMETRY=1
+      - DISABLE_TELEMETRY=1
+    extra_hosts:
+      - "host.docker.internal:host-gateway"
+    volumes:
+      - ./data:/app/data
     depends_on:
       - rag-api
     networks:
