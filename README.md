@@ -1,6 +1,6 @@
 # RAG Tutor - AI-Powered Document Q&A System
 
-A comprehensive Retrieval-Augmented Generation (RAG) system with FastAPI backend, Gradio UI, and full observability via Prometheus and Grafana.
+Retrieval-Augmented Generation (RAG) system with FastAPI backend, Gradio UI, and full observability via Prometheus and Grafana.
 
 ## Features
 
