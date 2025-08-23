@@ -35,18 +35,18 @@ class RAGService:
 
     async def _load_default_document(self) -> None:
         """Load the default document if it exists"""
-        pdf_path = settings.pdf_path
-        if os.path.exists(pdf_path):
+        pdf = settings.pdf
+        if os.path.exists(pdf):
             try:
-                with open(pdf_path, 'rb') as f:
+                with open(pdf, 'rb') as f:
                     content = f.read()
-                filename = os.path.basename(pdf_path)
+                filename = os.path.basename(pdf)
                 result = await self.ingest_document(filename, content, None)
                 print(f"✅ Loaded PDF document: {filename} ({result['chunks_created']} chunks)")
             except Exception as e:
                 print(f"⚠️ Failed to load PDF document: {e}")
         else:
-            print(f"ℹ️ No PDF document found at {pdf_path}")
+            print(f"ℹ️ No PDF document found at {pdf}")
 
     async def cleanup(self) -> None:
         # Chroma client does not require explicit close; leave hook for future resources
