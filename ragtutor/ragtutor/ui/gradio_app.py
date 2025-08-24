@@ -20,25 +20,27 @@ class RAGGradioInterface:
         self.rag_service = RAGService()
         await self.rag_service.initialize()
 
-    def query_wrapper(self, query: str, collection: str, top_k: int) -> Tuple[str, str]:
+    # The method is now async
+    async def query_wrapper(self, query: str, collection: str, top_k: int) -> Tuple[str, str]:
         """Wrapper for async query function"""
         try:
             if not self.rag_service:
                 return "❌ RAG service not initialized", ""
 
-            result = asyncio.run(
-                self.rag_service.query(
-                    query=query,
-                    top_k=top_k,
-                    collection_name=collection if collection else None,
-                )
+            # Directly await the async function call
+            result = await self.rag_service.query(
+                query=query,
+                top_k=top_k,
+                collection_name=collection if collection else None,
             )
 
             sources_text = ""
             if result.get("sources"):
                 sources_text = "\n\n**Sources:**\n"
                 for i, source in enumerate(result["sources"][:3], 1):
-                    sources_text += f"{i}. Page {source['metadata'].get('page', '?')}: {source['text'][:100]}...\n"
+                    # Check if 'metadata' and 'page' exist before accessing
+                    page_info = source["metadata"].get("page", "?") if source.get("metadata") else "?"
+                    sources_text += f"{i}. Page {page_info}: {source['text'][:100]}...\n"
 
             return result["answer"] + sources_text, ""
 
@@ -78,6 +80,7 @@ class RAGGradioInterface:
                 with gr.Column(scale=3):
                     output = gr.Markdown(label="Answer")
 
+            # Update the event listeners to use the async function
             submit_btn.click(
                 fn=self.query_wrapper,
                 inputs=[query_input, collection_input, top_k_slider],
@@ -116,5 +119,3 @@ def main():
 
 if __name__ == "__main__":
     main()
-
-

@@ -49,7 +49,7 @@ class RAGService:
             print(f"ℹ️ No PDF document found at {pdf}")
 
     async def cleanup(self) -> None:
-        # Chroma client does not require explicit close; leave hook for future resources
+        # Qdrant client does not require explicit close; leave hook for future resources
         pass
 
     async def ingest_document(self, filename: str, content: bytes, collection_name: Optional[str]) -> Dict[str, object]:
@@ -72,14 +72,15 @@ class RAGService:
         q_embed = self.embedder.embed([query])[0]
         results = self.vstore.query(collection, q_embed, top_k)
 
-        documents: List[str] = results.get("documents", [[]])[0]
-        metadatas: List[Dict[str, object]] = results.get("metadatas", [[]])[0]
-        distances: List[float] = results.get("distances", [[]])[0]
-
+        # The new results format is a list of dictionaries, so you can iterate directly.
         sources: List[Dict[str, object]] = []
-        for text, meta, dist in zip(documents, metadatas, distances):
-            sources.append({"text": text, "metadata": meta, "confidence_score": float(max(0.0, 1.0 - (dist or 0.0)))})
-
+        for result in results:
+            sources.append({
+                "text": result.get("documents", ""),
+                "metadata": result.get("metadatas", {}),
+                "confidence_score": float(max(0.0, 1.0 - (result.get("distances", 0.0)))),
+            })
+        
         context_parts = []
         for s in sources[:5]:
             context_parts.append(f"[p{ s['metadata'].get('page','?') }] {s['text']}")
@@ -97,5 +98,3 @@ class RAGService:
 
     async def list_collections(self) -> List[str]:
         return self.vstore.list_collections()
-
-
