@@ -131,6 +131,7 @@ class VectorStore:
                 raise ValueError(
                     f"chunks ({len(chunks)}) and embeddings ({len(embeddings)}) length mismatch"
                 )
+
             self.get_or_create_collection(collection_name)
 
             points: List[PointStruct] = []
@@ -149,11 +150,18 @@ class VectorStore:
             count = self.client.count(collection_name=collection_name, exact=True).count
             document_chunks_total.labels(collection=collection_name).set(count)
             logger.info(f"Upserted {len(points)} points into '{collection_name}'. Total={count}")
+
         except Exception as exc:
-            logger.error(f"Detailed error while adding chunks to vector store '{collection_name}': {exc}", exc_info=True)
-            logger.error(f"Chunks: {chunks[:2]} (showing up to 2), Embeddings shape: {len(embeddings)}x{len(embeddings[0]) if embeddings else 0}")
+            logger.error(
+                f"Detailed error while adding chunks to vector store '{collection_name}': {exc}",
+                exc_info=True
+            )
+            logger.error(
+                f"Chunks: {chunks[:2]} (showing up to 2), Embeddings shape: {len(embeddings)}x{len(embeddings[0]) if embeddings else 0}"
+            )
             raise RAGVectorStoreError(
-                f"Failed to add chunks to vector store for collection {collection_name}: {exc}", {"collection": collection_name, "details": str(exc)}
+                f"Failed to add chunks to vector store for collection {collection_name}: {exc}",
+                {"collection": collection_name, "details": str(exc)}
             ) from exc
 
     # -------------------------

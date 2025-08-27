@@ -13,7 +13,7 @@ services:
       - DISABLE_TELEMETRY=1
       # Qdrant settings
       - QDRANT_URL=http://qdrant:6333
-      # optionally: - EMBEDDING_DIM=384
+      - EMBEDDING_DIM=384
     extra_hosts:
       - "host.docker.internal:host-gateway"
     depends_on:

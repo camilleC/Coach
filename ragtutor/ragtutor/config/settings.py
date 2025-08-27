@@ -39,9 +39,10 @@ class Settings(BaseSettings):
     llm_api_key: str = Field("ollama", env="LLM_API_KEY")
     llm_timeout: int = Field(30, env="LLM_TIMEOUT")
     max_tokens: int = Field(512, env="MAX_TOKENS")
+    embedding_dim: int = Field(384, env="EMBEDDING_DIM") 
 
     # ========================
-    # Monitoring
+    # Monitoringa
     # ========================
     prometheus_scrape_interval: str = Field("5s", env="PROMETHEUS_SCRAPE_INTERVAL")
     prometheus_host_port: int = Field(9090, env="PROMETHEUS_HOST_PORT")
