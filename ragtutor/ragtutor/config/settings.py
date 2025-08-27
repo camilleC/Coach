@@ -1,10 +1,14 @@
+from __future__ import annotations
+
+import logging
+from pathlib import Path
+from typing import Optional
+
 from pydantic import Field, field_validator, model_validator
 from pydantic_settings import BaseSettings
-from typing import Optional
-from pathlib import Path
-import logging
 
 logger = logging.getLogger(__name__)
+
 
 class Settings(BaseSettings):
     # ========================
@@ -15,9 +19,10 @@ class Settings(BaseSettings):
     log_level: str = Field("INFO", env="LOG_LEVEL")
 
     # ========================
-    # RAG / Vector Database
+    # RAG / Vector Database (Qdrant)
     # ========================
-    vector_db_persist_dir: str = Field("./data/chroma", env="VECTOR_DB_PERSIST_DIR")
+    vector_db_host: str = Field("qdrant", env="VECTOR_DB_HOST")
+    vector_db_port: int = Field(6333, env="VECTOR_DB_PORT")
     collection_name: str = Field("documents", env="COLLECTION_NAME")
     embedding_model: str = Field("sentence-transformers/all-MiniLM-L6-v2", env="EMBEDDING_MODEL")
     chunk_size: int = Field(1000, env="CHUNK_SIZE")
@@ -30,13 +35,14 @@ class Settings(BaseSettings):
     # LLM
     # ========================
     llm_model: str = Field("llama3.2", env="LLM_MODEL")
-    llm_base_url: str = Field("http://localhost:11434/v1", env="LLM_BASE_URL")
+    llm_base_url: str = Field("http://host.docker.internal:11434/v1", env="LLM_BASE_URL")
     llm_api_key: str = Field("ollama", env="LLM_API_KEY")
     llm_timeout: int = Field(30, env="LLM_TIMEOUT")
     max_tokens: int = Field(512, env="MAX_TOKENS")
+    embedding_dim: int = Field(384, env="EMBEDDING_DIM") 
 
     # ========================
-    # Monitoring
+    # Monitoringa
     # ========================
     prometheus_scrape_interval: str = Field("5s", env="PROMETHEUS_SCRAPE_INTERVAL")
     prometheus_host_port: int = Field(9090, env="PROMETHEUS_HOST_PORT")
@@ -51,7 +57,7 @@ class Settings(BaseSettings):
     # ========================
     # Validators
     # ========================
-    @field_validator('pdf')
+    @field_validator("pdf")
     @classmethod
     def validate_pdf_path(cls, v: Optional[str]) -> Optional[str]:
         if v is None:
@@ -59,16 +65,16 @@ class Settings(BaseSettings):
         pdf_file = Path(v)
         if not pdf_file.exists():
             logger.warning(f"⚠️ PDF file not found: {v}")
-        elif pdf_file.suffix.lower() != '.pdf':
+        elif pdf_file.suffix.lower() != ".pdf":
             logger.warning(f"⚠️ File is not a PDF: {v}")
         else:
             logger.info(f"✅ PDF file found: {v}")
         return str(pdf_file)
 
-    @model_validator(mode='after')
+    @model_validator(mode="after")
     def _validate_chunking_and_pdf(self):
         if self.chunk_overlap >= self.chunk_size:
-            raise ValueError('chunk_overlap must be less than chunk_size')
+            raise ValueError("chunk_overlap must be less than chunk_size")
 
         if not self.pdf:
             self.pdf = self.default_document_path
@@ -81,6 +87,7 @@ class Settings(BaseSettings):
     @property
     def effective_pdf_path(self) -> str:
         return self.pdf
+
 
 # Create the settings instance
 settings = Settings()
