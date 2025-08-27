@@ -1,33 +1,26 @@
+# ui/gradio_app.py
 import asyncio
 import logging
-import os
 from typing import Tuple
 
 import gradio as gr
-
 from ..core.rag_service import RAGService
-from ..config.settings import settings
-
 
 logger = logging.getLogger(__name__)
 
-
 class RAGGradioInterface:
     def __init__(self):
-        self.rag_service = None
+        self.rag_service: RAGService = None
 
     async def initialize(self):
         self.rag_service = RAGService()
         await self.rag_service.initialize()
 
-    # The method is now async
     async def query_wrapper(self, query: str, collection: str, top_k: int) -> Tuple[str, str]:
-        """Wrapper for async query function"""
         try:
             if not self.rag_service:
                 return "❌ RAG service not initialized", ""
 
-            # Directly await the async function call
             result = await self.rag_service.query(
                 query=query,
                 top_k=top_k,
@@ -38,7 +31,6 @@ class RAGGradioInterface:
             if result.get("sources"):
                 sources_text = "\n\n**Sources:**\n"
                 for i, source in enumerate(result["sources"][:3], 1):
-                    # Check if 'metadata' and 'page' exist before accessing
                     page_info = source["metadata"].get("page", "?") if source.get("metadata") else "?"
                     sources_text += f"{i}. Page {page_info}: {source['text'][:100]}...\n"
 
@@ -49,7 +41,6 @@ class RAGGradioInterface:
             return f"❌ Error: {str(e)}", ""
 
     def create_interface(self):
-        """Create Gradio interface"""
         with gr.Blocks(title="Personal Coach", theme=gr.themes.Soft()) as demo:
             gr.Markdown("# 📚 Personal Coach")
             gr.Markdown("Ask questions about your uploaded documents and get AI-powered answers with source citations.")
@@ -57,49 +48,35 @@ class RAGGradioInterface:
             with gr.Row():
                 with gr.Column(scale=2):
                     query_input = gr.Textbox(
-                        label="I need help deciding if I should go on vacation.",
-                        placeholder="e.g., When you think about going on vacation how do you feel?",
+                        label="Your Question",
+                        placeholder="e.g., How do I start my next project?",
                         lines=3,
                     )
-
-                    with gr.Row():
-                        collection_input = gr.Textbox(
-                            label="Collection Name (optional)",
-                            placeholder="Leave empty for default collection",
-                        )
-                        top_k_slider = gr.Slider(
-                            minimum=1,
-                            maximum=10,
-                            value=5,
-                            step=1,
-                            label="Number of Sources",
-                        )
-
+                    collection_input = gr.Textbox(
+                        label="Collection Name (optional)",
+                        placeholder="Leave empty for default collection",
+                    )
+                    top_k_slider = gr.Slider(
+                        minimum=1,
+                        maximum=10,
+                        value=5,
+                        step=1,
+                        label="Number of Sources",
+                    )
                     submit_btn = gr.Button("🔍 Ask Question", variant="primary")
 
                 with gr.Column(scale=3):
                     output = gr.Markdown(label="Answer")
 
-            # Update the event listeners to use the async function
             submit_btn.click(
                 fn=self.query_wrapper,
                 inputs=[query_input, collection_input, top_k_slider],
                 outputs=[output, query_input],
             )
-
             query_input.submit(
                 fn=self.query_wrapper,
                 inputs=[query_input, collection_input, top_k_slider],
                 outputs=[output, query_input],
-            )
-
-            gr.Markdown(
-                """
-            ### Example Questions:
-            - "I need help deciding if I should change careers?"
-            - "I'm not sure how to start my next project?"
-            - "should I bring a new business partner onto the project?"
-            """
             )
 
         return demo
