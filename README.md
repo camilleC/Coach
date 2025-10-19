@@ -42,7 +42,7 @@ pip install -e .
 uvicorn ragtutor.api.main:app --host 0.0.0.0 --port 8000
 
 # In another terminal, start Gradio UI
-python -m ragtutor.ui.gradio_app
+python -m coach.ui.gradio_app
 ```
 
 ## API Usage

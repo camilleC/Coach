@@ -20,18 +20,18 @@ help:
 setup:
 	python3 -m venv $(VENV_DIR)
 	$(PIP) install --upgrade pip
-	$(PIP) install -r ragtutor/requirements.txt
+	$(PIP) install -r requirements.txt
 	@echo "Setup complete! Virtual environment created and dependencies installed."
 
 # Install/update dependencies only
 .PHONY: install
 install:
-	$(PIP) install -r ragtutor/requirements.txt
+	$(PIP) install -r requirements.txt
 
 # Ingest PDF
 .PHONY: ingest
 ingest:
-	$(PYTHON) ragtutor/ui/gradio_app.py --pdf $(PDF_FILE) --rebuild
+	PYTHONPATH=./src $(PYTHON) -m coach.ui.gradio_app --pdf $(PDF_FILE) --rebuild
 
 # Test query (usage: make query Q="How do I set goals?")
 .PHONY: query
@@ -40,21 +40,21 @@ query:
 		echo "Usage: make query Q='your question here'"; \
 		exit 1; \
 	fi
-	$(PYTHON) ragtutor/ui/gradio_app.py --query "$(Q)"
+	PYTHONPATH=./src $(PYTHON) -m coach.ui.gradio_app --query "$(Q)"
 
 # Launch UI
 .PHONY: serve
 serve:
-	$(PYTHON) ragtutor/ui/gradio_app.py --serve
+	PYTHONPATH=./src $(PYTHON) -m coach.ui.gradio_app --serve
 
 # Clean up
 .PHONY: clean
 clean:
 	rm -rf $(VENV_DIR)
-	rm -rf ./storage
+	rm -rf ./data/chroma ./data/vector_store
 
 # Clear vector database only
 .PHONY: reset-db
 reset-db:
-	rm -rf ./storage
+	rm -rf ./data/chroma ./data/vector_store
 	@echo "Vector database cleared. Run 'make ingest' to rebuild."

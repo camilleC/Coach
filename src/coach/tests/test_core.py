@@ -1,4 +1,4 @@
-from ragtutor.core.document_processor import _split_text_with_overlap
+from coach.core.document_processor import _split_text_with_overlap
 
 
 def test_split_text_with_overlap_basic():
