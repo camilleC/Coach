@@ -1,3 +1,5 @@
+# If you get errors run this - yamllint docker-compose.yml
+# Note: May need to install pip install yamllint
 services:
   rag-api:
     build: .
@@ -42,12 +44,15 @@ services:
       - DISABLE_TELEMETRY=1
       - CHUNK_SIZE=${CHUNK_SIZE:-1000}
       - CHUNK_OVERLAP=${CHUNK_OVERLAP:-150}
+      - QDRANT_URL=http://qdrant:6333
+      - EMBEDDING_DIM=384
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/app/data
     depends_on:
       - rag-api
+      - qdrant
     networks:
       - rag-network
 

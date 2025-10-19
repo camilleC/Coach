@@ -20,18 +20,18 @@ help:
 setup:
 	python3 -m venv $(VENV_DIR)
 	$(PIP) install --upgrade pip
-	$(PIP) install -r requirements.txt
+	$(PIP) install -r ragtutor/requirements.txt
 	@echo "Setup complete! Virtual environment created and dependencies installed."
 
 # Install/update dependencies only
 .PHONY: install
 install:
-	$(PIP) install -r requirements.txt
+	$(PIP) install -r ragtutor/requirements.txt
 
 # Ingest PDF
 .PHONY: ingest
 ingest:
-	$(PYTHON) rag_local_pdf.py --pdf $(PDF_FILE) --rebuild
+	$(PYTHON) ragtutor/ui/gradio_app.py --pdf $(PDF_FILE) --rebuild
 
 # Test query (usage: make query Q="How do I set goals?")
 .PHONY: query
@@ -40,12 +40,12 @@ query:
 		echo "Usage: make query Q='your question here'"; \
 		exit 1; \
 	fi
-	$(PYTHON) rag_local_pdf.py --query "$(Q)"
+	$(PYTHON) ragtutor/ui/gradio_app.py --query "$(Q)"
 
 # Launch UI
 .PHONY: serve
 serve:
-	$(PYTHON) rag_local_pdf.py --serve
+	$(PYTHON) ragtutor/ui/gradio_app.py --serve
 
 # Clean up
 .PHONY: clean
@@ -53,7 +53,7 @@ clean:
 	rm -rf $(VENV_DIR)
 	rm -rf ./storage
 
-# Reset database only
+# Clear vector database only
 .PHONY: reset-db
 reset-db:
 	rm -rf ./storage
