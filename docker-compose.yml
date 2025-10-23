@@ -10,7 +10,7 @@ services:
       - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
       - MODEL_NAME=${MODEL_NAME:-llama3.2}
       - LLM_API_KEY=${LLM_API_KEY:-ollama}
-      - PDF=${PDF:-/app/data/coach.pdf}
+      - PDF=${PDF:-/app/data/coaching.pdf}
       - HF_HUB_DISABLE_TELEMETRY=1
       - DISABLE_TELEMETRY=1
       # Qdrant settings
@@ -38,7 +38,7 @@ services:
       - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
       - LLM_API_KEY=${LLM_API_KEY:-ollama}
       - MODEL_NAME=${MODEL_NAME:-llama3.2}
-      - PDF=${PDF:-/app/data/coach.pdf}
+      - PDF=${PDF:-/app/data/coaching.pdf}
       - GRADIO_ANALYTICS_DISABLED=true
       - HF_HUB_DISABLE_TELEMETRY=1
       - DISABLE_TELEMETRY=1

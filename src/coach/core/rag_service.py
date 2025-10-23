@@ -32,7 +32,7 @@ class RAGService:
         """Initialize embedding client, vector store, and LLM."""
         self.embedder = EmbeddingClient()
 
-        # ✅ Qdrant vector store (no persist_directory)
+        # Qdrant vector store (no persist_directory)
         self.vstore = VectorStore()
 
         self.llm = LLMClient()
