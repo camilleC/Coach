@@ -3,7 +3,7 @@
 from qdrant_client import QdrantClient
 import os
 
-host = os.getenv("VECTOR_DB_HOST", "qdrant")
+host = os.getenv("VECTOR_DB_HOST", "localhost")
 port = int(os.getenv("VECTOR_DB_PORT", "6333"))
 
 client = QdrantClient(host=host, port=port)

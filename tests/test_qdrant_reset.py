@@ -1,9 +1,12 @@
+import os
 from qdrant_client import QdrantClient
 
 # -----------------------
 # Connection
 # -----------------------
-client = QdrantClient(host='qdrant', port=6333)
+host = os.getenv('VECTOR_DB_HOST', 'localhost')
+port = int(os.getenv('VECTOR_DB_PORT', '6333'))
+client = QdrantClient(host=host, port=port)
 
 # -----------------------
 # Settings
