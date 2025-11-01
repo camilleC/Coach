@@ -2,7 +2,7 @@ import pytest
 from httpx import AsyncClient
 from fastapi import FastAPI
 
-from ragtutor.api.main import app
+from coach.api.main import app
 
 
 @pytest.mark.asyncio

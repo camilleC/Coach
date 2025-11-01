@@ -1,3 +1,5 @@
+# If you get errors run this - yamllint docker-compose.yml
+# Note: May need to install pip install yamllint
 services:
   rag-api:
     build: .
@@ -8,7 +10,7 @@ services:
       - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
       - MODEL_NAME=${MODEL_NAME:-llama3.2}
       - LLM_API_KEY=${LLM_API_KEY:-ollama}
-      - PDF=${PDF:-/app/data/coach.pdf}
+      - PDF=${PDF:-/app/data/coaching.pdf}
       - HF_HUB_DISABLE_TELEMETRY=1
       - DISABLE_TELEMETRY=1
       # Qdrant settings
@@ -26,7 +28,7 @@ services:
 
   rag-ui:
     build: .
-    command: python -m ragtutor.ui.gradio_app
+    command: python -m coach.ui.gradio_app
     ports:
       - "7860:7860"
     environment:
@@ -36,18 +38,21 @@ services:
       - LLM_BASE_URL=${LLM_BASE_URL:-http://host.docker.internal:11434/v1}
       - LLM_API_KEY=${LLM_API_KEY:-ollama}
       - MODEL_NAME=${MODEL_NAME:-llama3.2}
-      - PDF=${PDF:-/app/data/coach.pdf}
+      - PDF=${PDF:-/app/data/coaching.pdf}
       - GRADIO_ANALYTICS_DISABLED=true
       - HF_HUB_DISABLE_TELEMETRY=1
       - DISABLE_TELEMETRY=1
       - CHUNK_SIZE=${CHUNK_SIZE:-1000}
       - CHUNK_OVERLAP=${CHUNK_OVERLAP:-150}
+      - QDRANT_URL=http://qdrant:6333
+      - EMBEDDING_DIM=384
     extra_hosts:
       - "host.docker.internal:host-gateway"
     volumes:
       - ./data:/app/data
     depends_on:
       - rag-api
+      - qdrant
     networks:
       - rag-network
 
@@ -65,7 +70,7 @@ services:
     ports:
       - "${PROMETHEUS_HOST_PORT:-9090}:9090"
     volumes:
-      - ./prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
+      - ./monitoring/prometheus/prometheus.yml:/etc/prometheus/prometheus.yml
       - prometheus_data:/prometheus
     command:
       - '--config.file=/etc/prometheus/prometheus.yml'
@@ -84,8 +89,8 @@ services:
       - GF_SECURITY_ADMIN_PASSWORD=${GRAFANA_ADMIN_PASSWORD:-admin}
     volumes:
       - grafana_data:/var/lib/grafana
-      - ./grafana/provisioning:/etc/grafana/provisioning
-      - ./grafana/dashboards:/var/lib/grafana/dashboards
+      - ./monitoring/grafana/provisioning:/etc/grafana/provisioning
+      - ./monitoring/grafana/dashboards:/var/lib/grafana/dashboards
     depends_on:
       - prometheus
     networks:

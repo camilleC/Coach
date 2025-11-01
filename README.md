@@ -42,7 +42,7 @@ pip install -e .
 uvicorn ragtutor.api.main:app --host 0.0.0.0 --port 8000
 
 # In another terminal, start Gradio UI
-python -m ragtutor.ui.gradio_app
+python -m coach.ui.gradio_app
 ```
 
 ## API Usage
@@ -105,9 +105,9 @@ pytest ragtutor/tests/test_api.py
 ## Development
 
 ### Adding New Features
-1. Add business logic in `ragtutor/core/`
-2. Add API endpoints in `ragtutor/api/routes.py`
-3. Add UI components in `ragtutor/ui/`
+1. Add business logic in `src/coach/core/`
+2. Add API endpoints in `src/coach/api/routes.py`
+3. Add UI components in `src/coach/ui/`
 4. Add tests in `ragtutor/tests/`
 
 ### Monitoring

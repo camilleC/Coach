@@ -168,3 +168,8 @@ data/*.sqlite3
 storage/
 uploads/
 *.pdf
+
+# Part of cleanup. Once Qdrant is added, this can be removed
+ragtutor/data/chroma/
+ragtutor/data/vector_store/
+.DS_Store

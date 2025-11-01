@@ -1,4 +1,4 @@
-from ragtutor.ui.components import header
+from coach.ui.components import header
 
 
 def test_header():

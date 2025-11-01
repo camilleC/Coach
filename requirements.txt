@@ -1,0 +1,23 @@
+fastapi==0.109.2
+uvicorn[standard]==0.27.0
+gradio==4.19.2
+pydantic==2.6.1
+pydantic-settings==2.1.0
+prometheus-fastapi-instrumentator==7.0.0
+prometheus-client==0.20.0
+tenacity==8.2.3
+python-multipart>=0.0.9
+aiofiles==23.2.1
+
+# Document processing
+pypdf==3.17.1
+qdrant-client==1.12.1
+huggingface_hub==0.19.3
+sentence-transformers==2.2.2
+ollama==0.1.7
+
+# Testing
+pytest==7.4.3
+pytest-asyncio==0.21.2
+pytest-cov==4.1.0
+httpx==0.25.2

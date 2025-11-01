@@ -1,0 +1,49 @@
+# Python
+__pycache__
+*.pyc
+*.pyo
+*.pyd
+.Python
+*.so
+*.egg
+*.egg-info
+dist
+build
+
+# Virtual environments
+.venv
+venv
+ENV
+env
+
+# Git
+.git
+.gitignore
+
+# Backups
+Coach_backup
+
+# Data (will be mounted as volume)
+data/chroma
+data/vector_store
+data/uploads
+*.db
+*.sqlite3
+
+# Testing
+.pytest_cache
+.coverage
+htmlcov
+
+# Logs
+*.log
+
+# OS
+.DS_Store
+
+# Not needed in container
+monitoring
+tests
+scripts
+makefile
+README.md
